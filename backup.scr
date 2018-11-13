@@ -5,14 +5,30 @@ export PATH=/bin:/usr/bin:$PATH
 BIN_DIR=$HOME/bin/backup_bin 
 BKUP_DIR=$HOME/Backup
 PC_DIR=jason.ubuntu.backup
-
+LOG=backup.log
 # Mount path for /dev/sda6
 MOUNT_PATH=/E-DATA
+DEBUG_FILE=${BKUP_DIR}/.debug_backup
+
+exec 2>>${BKUP_DIR}/${LOG}
+
+
+echo "======================================================================" >>${BKUP_DIR}/${LOG}
+echo "${0##*/} started on $(date)" >>${BKUP_DIR}/${LOG}
+
+if [ -f ${DEBUG_FILE} ]
+then
+	echo "******Debug mode has been turned on******" >> ${BKUP_DIR}/${LOG}
+	set -x
+fi
 
 DATE=$(date +"%Y%m%d")
 
-echo "======================================================================" >>${BKUP_DIR}/backup.log
-echo "${0##*/} started on $(date)" >>${BKUP_DIR}/backup.log
+if [ -z ${DATE} ]
+then
+	echo "ERROR: Cannot determine date. Exit!">>${BKUP_DIR}/${LOG}
+	exit 1
+fi
 
 mkdir -p ${BKUP_DIR}/${DATE}
 
@@ -23,7 +39,7 @@ do
 	tar -czvf ${BKUP_DIR}/${DATE}/${dir##*/}.tar.gz ${dir}
 	if [[ $? -ne 0 ]]
 	then
-		echo "ERROR: Failed to backup ${dir}!" >> ${BKUP_DIR}/backup.log	
+		echo "ERROR: Failed to backup ${dir}!" >> ${BKUP_DIR}/${LOG}	
 	fi
 done
 
@@ -33,7 +49,7 @@ crontab -l >${BKUP_DIR}/${DATE}/crons
 
 cd ${BKUP_DIR}
 tar -czvf ubuntu.jason.${DATE}.tar.gz ${DATE}
-echo "ubuntu.jason.${DATE}.tar.gz has been succesfully created at $(date)!" >>backup.log
+echo "ubuntu.jason.${DATE}.tar.gz has been succesfully created at $(date)!" >>${LOG}
 
 rm -rf ${DATE}
 
@@ -43,24 +59,29 @@ rm -rf ${DATE}
 if [ -d ${MOUNT_PATH}/${PC_DIR} ]
 then
 	cp ubuntu.jason.${DATE}.tar.gz ${MOUNT_PATH}/${PC_DIR}/
-	echo "ubuntu.jason.${DATE}.tar.gz has been succesfully transfered to ${MOUNT_PATH}/${PC_DIR}!" >>backup.log
+	echo "ubuntu.jason.${DATE}.tar.gz has been succesfully transfered to ${MOUNT_PATH}/${PC_DIR}!" >>${LOG}
 	DISK_USE=$(df ${MOUNT_PATH} |tail -1  |awk  '{print $5}')
 	if [[ ${DISK_USE} =~ [0-9]% ]]
 	then
-		echo "INFO: ${MOUNT_PATH} disk usage is: ${DISK_USE}" >>backup.log
+		echo "INFO: ${MOUNT_PATH} disk usage is: ${DISK_USE}" >>${LOG}
 		if [ ${DISK_USE//%} -gt 80 ]
 		then
-			echo "ERROR: ${MOUNT_PATH} disk usage has beyond 80%. Ugent clean up needed! " >>backup.log
+			echo "ERROR: ${MOUNT_PATH} disk usage has beyond 80%. Ugent clean up needed! " >>${LOG}
 		elif [ ${DISK_USE//%} -gt 60 ]
 		then
-			echo "WARNING: ${MOUNT_PATH} disk usage has beyond 60%. Clean up needed! " >>backup.log
+			echo "WARNING: ${MOUNT_PATH} disk usage has beyond 60%. Clean up needed! " >>${LOG}
 		fi
 	else
-		echo "WARNING: Cannot determine the disk usage of ${MOUNT_PATH}!" >>backup.log
+		echo "WARNING: Cannot determine the disk usage of ${MOUNT_PATH}!" >>${LOG}
 	fi
 	
 else
-	echo "ERROR: ${MOUNT_PATH}/${PC_DIR} missing! ubuntu.jason.${DATE}.tar.gz cannot been transferred to PC!" >>backup.log
+	echo "ERROR: ${MOUNT_PATH}/${PC_DIR} missing! ubuntu.jason.${DATE}.tar.gz cannot been transferred to PC!" >>${LOG}
 fi
 
-echo "${0##*/} completed on $(date)" >>backup.log
+if [ -f ${DEBUG_FILE} ]
+then
+	set +x
+fi
+
+echo "${0##*/} completed on $(date)" >>${LOG}
