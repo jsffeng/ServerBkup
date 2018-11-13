@@ -1,0 +1,4 @@
+# Directory under $HOME or absolute path
+# Example:
+#	bin -> $HOME/bin
+#	/home/webadm/html ->  Owned by othe rlogin, need have read permission

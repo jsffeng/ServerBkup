@@ -1,0 +1,66 @@
+#!/bin/bash
+
+export PATH=/bin:/usr/bin:$PATH 
+
+BIN_DIR=$HOME/bin/backup_bin 
+BKUP_DIR=$HOME/Backup
+PC_DIR=jason.ubuntu.backup
+
+# Mount path for /dev/sda6
+MOUNT_PATH=/E-DATA
+
+DATE=$(date +"%Y%m%d")
+
+echo "======================================================================" >>${BKUP_DIR}/backup.log
+echo "${0##*/} started on $(date)" >>${BKUP_DIR}/backup.log
+
+mkdir -p ${BKUP_DIR}/${DATE}
+
+cd $HOME
+
+cat ${BIN_DIR}/bkup.list|grep -v ^# |grep -v ^$ |while read dir
+do
+	tar -czvf ${BKUP_DIR}/${DATE}/${dir##*/}.tar.gz ${dir}
+	if [[ $? -ne 0 ]]
+	then
+		echo "ERROR: Failed to backup ${dir}!" >> ${BKUP_DIR}/backup.log	
+	fi
+done
+
+cp .profile ${BKUP_DIR}/${DATE}/profile
+cp README ${BKUP_DIR}/${DATE}/README
+crontab -l >${BKUP_DIR}/${DATE}/crons
+
+cd ${BKUP_DIR}
+tar -czvf ubuntu.jason.${DATE}.tar.gz ${DATE}
+echo "ubuntu.jason.${DATE}.tar.gz has been succesfully created at $(date)!" >>backup.log
+
+rm -rf ${DATE}
+
+#
+# Transfered to E Disk in Window XP
+
+if [ -d ${MOUNT_PATH}/${PC_DIR} ]
+then
+	cp ubuntu.jason.${DATE}.tar.gz ${MOUNT_PATH}/${PC_DIR}/
+	echo "ubuntu.jason.${DATE}.tar.gz has been succesfully transfered to ${MOUNT_PATH}/${PC_DIR}!" >>backup.log
+	DISK_USE=$(df ${MOUNT_PATH} |tail -1  |awk  '{print $5}')
+	if [[ ${DISK_USE} =~ [0-9]% ]]
+	then
+		echo "INFO: ${MOUNT_PATH} disk usage is: ${DISK_USE}" >>backup.log
+		if [ ${DISK_USE//%} -gt 80 ]
+		then
+			echo "ERROR: ${MOUNT_PATH} disk usage has beyond 80%. Ugent clean up needed! " >>backup.log
+		elif [ ${DISK_USE//%} -gt 60 ]
+		then
+			echo "WARNING: ${MOUNT_PATH} disk usage has beyond 60%. Clean up needed! " >>backup.log
+		fi
+	else
+		echo "WARNING: Cannot determine the disk usage of ${MOUNT_PATH}!" >>backup.log
+	fi
+	
+else
+	echo "ERROR: ${MOUNT_PATH}/${PC_DIR} missing! ubuntu.jason.${DATE}.tar.gz cannot been transferred to PC!" >>backup.log
+fi
+
+echo "${0##*/} completed on $(date)" >>backup.log
