@@ -1,4 +1,7 @@
-# Directory under $HOME or absolute path
+# Specify directories or files with relative path to user's home or using absolute path 
+# To backup crontab, use key words CRONTAB
+# Blank and tab will be ignored in this file
 # Example:
-#	bin -> $HOME/bin
-#	/home/webadm/html ->  Owned by othe rlogin, need have read permission
+#	bin
+#	/home/<other user's login>/html
+#       CRONTAB

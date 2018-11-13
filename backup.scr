@@ -2,16 +2,22 @@
 
 export PATH=/bin:/usr/bin:$PATH 
 
+# User config
+LOGIN=jason
+LINUX_VER=ubuntu
+
+# Variables defined by the tool
+HOME=/home/${LOGIN}
 BIN_DIR=$HOME/bin/backup_bin 
 BKUP_DIR=$HOME/Backup
-PC_DIR=jason.ubuntu.backup
+PC_DIR=${LOGIN}.${LINUX_VER}.backup
 LOG=backup.log
-# Mount path for /dev/sda6
-MOUNT_PATH=/E-DATA
 DEBUG_FILE=${BKUP_DIR}/.debug_backup
 
-exec 2>>${BKUP_DIR}/${LOG}
+# Mount path for Windows disk. e.g. adding /dev/sda6 into fstab 
+MOUNT_PATH=/E-DATA
 
+exec 2>>${BKUP_DIR}/${LOG}
 
 echo "======================================================================" >>${BKUP_DIR}/${LOG}
 echo "${0##*/} started on $(date)" >>${BKUP_DIR}/${LOG}
@@ -34,39 +40,47 @@ mkdir -p ${BKUP_DIR}/${DATE}
 
 cd $HOME
 
-cat ${BIN_DIR}/bkup.list|grep -v ^# |grep -v ^$ |while read dir
+# Ignore comments and blank lines in bkup.list file
+cat ${BIN_DIR}/bkup.list|grep -v ^# |grep -v ^$ |while read dir_file
 do
-	tar -czvf ${BKUP_DIR}/${DATE}/${dir##*/}.tar.gz ${dir}
-	if [[ $? -ne 0 ]]
+	if [ -d ${dir_file} ]
 	then
-		echo "ERROR: Failed to backup ${dir}!" >> ${BKUP_DIR}/${LOG}	
+
+		tar -czvf ${BKUP_DIR}/${DATE}/${dir_file##*/}.tar.gz ${dir_file}
+		if [[ $? -ne 0 ]]
+		then
+			echo "ERROR: Failed to backup ${dir_file}!" >> ${BKUP_DIR}/${LOG}	
+		fi
+	elif [ -f ${dir_file} ]
+	then
+		cp ${dir_file} ${BKUP_DIR}/${DATE}/ 
+	elif [ ${dir_file} == "CRONTAB" ]
+	then
+		crontab -l >${BKUP_DIR}/${DATE}/crons
+	else
+		echo "ERROR: ${dir_file} is not a directory or a file. Failed to backup!" >> ${BKUP_DIR}/${LOG}	
 	fi
 done
 
-cp .profile ${BKUP_DIR}/${DATE}/profile
-cp README ${BKUP_DIR}/${DATE}/README
-crontab -l >${BKUP_DIR}/${DATE}/crons
-
 cd ${BKUP_DIR}
-tar -czvf ubuntu.jason.${DATE}.tar.gz ${DATE}
-echo "ubuntu.jason.${DATE}.tar.gz has been succesfully created at $(date)!" >>${LOG}
+tar -czvf ${LINUX_VER}.${LOGIN}.${DATE}.tar.gz ${DATE}
+echo "${LINUX_VER}.${LOGIN}.${DATE}.tar.gz has been succesfully created at $(date)!" >>${LOG}
 
 rm -rf ${DATE}
 
-#
-# Transfered to E Disk in Window XP
+# Transfered to E Disk in Windows OS 
 
 if [ -d ${MOUNT_PATH}/${PC_DIR} ]
 then
-	cp ubuntu.jason.${DATE}.tar.gz ${MOUNT_PATH}/${PC_DIR}/
-	echo "ubuntu.jason.${DATE}.tar.gz has been succesfully transfered to ${MOUNT_PATH}/${PC_DIR}!" >>${LOG}
+	cp ${LINUX_VER}.${LOGIN}.${DATE}.tar.gz ${MOUNT_PATH}/${PC_DIR}/
+	echo "${LINUX_VER}.${LOGIN}.${DATE}.tar.gz has been succesfully transfered to ${MOUNT_PATH}/${PC_DIR}!" >>${LOG}
 	DISK_USE=$(df ${MOUNT_PATH} |tail -1  |awk  '{print $5}')
 	if [[ ${DISK_USE} =~ [0-9]% ]]
 	then
 		echo "INFO: ${MOUNT_PATH} disk usage is: ${DISK_USE}" >>${LOG}
 		if [ ${DISK_USE//%} -gt 80 ]
 		then
-			echo "ERROR: ${MOUNT_PATH} disk usage has beyond 80%. Ugent clean up needed! " >>${LOG}
+			echo "ERROR: ${MOUNT_PATH} disk usage has beyond 80%. Urgent clean up needed! " >>${LOG}
 		elif [ ${DISK_USE//%} -gt 60 ]
 		then
 			echo "WARNING: ${MOUNT_PATH} disk usage has beyond 60%. Clean up needed! " >>${LOG}
@@ -76,7 +90,7 @@ then
 	fi
 	
 else
-	echo "ERROR: ${MOUNT_PATH}/${PC_DIR} missing! ubuntu.jason.${DATE}.tar.gz cannot been transferred to PC!" >>${LOG}
+	echo "ERROR: ${MOUNT_PATH}/${PC_DIR} missing! ${LINUX_VER}.${LOGIN}.${DATE}.tar.gz cannot been transferred to PC!" >>${LOG}
 fi
 
 if [ -f ${DEBUG_FILE} ]
