@@ -45,7 +45,6 @@ cat ${BIN_DIR}/bkup.list|grep -v ^# |grep -v ^$ |while read dir_file
 do
 	if [ -d ${dir_file} ]
 	then
-
 		tar -czvf ${BKUP_DIR}/${DATE}/${dir_file##*/}.tar.gz ${dir_file}
 		if [[ $? -ne 0 ]]
 		then
@@ -88,7 +87,6 @@ then
 	else
 		echo "WARNING: Cannot determine the disk usage of ${MOUNT_PATH}!" >>${LOG}
 	fi
-	
 else
 	echo "ERROR: ${MOUNT_PATH}/${PC_DIR} missing! ${LINUX_VER}.${LOGIN}.${DATE}.tar.gz cannot been transferred to PC!" >>${LOG}
 fi
