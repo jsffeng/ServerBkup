@@ -3,8 +3,8 @@ Tool description:
 This is a bash cron job to do backup specified directories/files running on Linux server.
 
 Currently it works well for my Linux PC (with ubuntu 16 and Windows OS installed). The backup will do the following two steps:
-1. step 1 - will backup to a directory residing on Linux. It will only contain the latest backup in 30 days 
-2. step 2 - will backup to a disk shared cross-mounted between Linux and windows. It will contain all backup, if the disk usage run above
+    step 1 - will backup to a directory residing on Linux. It will only contain the latest backup in 30 days 
+    step 2 - will backup to a disk shared cross-mounted between Linux and windows. It will contain all backup, if the disk usage run above
 80%, an error will be reported. 
 
 Source tools (these scripts under installation directory):
