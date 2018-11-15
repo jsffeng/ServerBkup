@@ -22,7 +22,7 @@ Output files:
 
 Logging:     
 --------   
-Log will be stored at the directory specified by step-1. Name as backup.log   
+Log will be stored at the directory specified by step-1, named as backup.log   
 
 Debugging:   
 ----------   
@@ -32,10 +32,10 @@ Debugging information will be saved to backup.log once the cron job got invoked.
 
 To-do items:
 ------------
-For step-2, need to verify whether mount/umount is needed to seperate the step2 Disk from LINUX once backup is done. In this way, the Disk involved in step-2 should not be impacetd even if any corruptpion happened in LINUX enviornment. However, this may require root permission, so need to think about it.   
+For step-2, need to evaluate whether mount/umount is needed to seperate the step-2 Disk from LINUX once backup is done. In this way, the Disk involved in step-2 should not be impacetd even if any corruptpion happened in LINUX enviornment. However, this may require root permission. Alternatively, create a seperate cron job for root login, this is optional for users and can mount/umount step-2 Disk as schedule if needed.
 
-More to-do items to make it portable for others to use:
--------------------------------------------------------
+More to-do items to make it portable for others to use:  
+-------------------------------------------------------  
 1. Make step-1 and step-2 configurable by users.
 2. Create an installation script to do:  
       - Read LOGIN from LINUX environment.  
