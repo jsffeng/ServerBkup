@@ -31,7 +31,8 @@ should not be impacetd even if any corruptpion happened in LINUX enviornment.
 There are following to-do items to make it portable for others to use:
 ----------------------------------------------------------------------
 1. Make step1 and step2 configurable by users.
-2. Create an install script to do:
-          a) Read LOGIN from LINUX environment.
-          b) Gather user's input for installation directory.
-          c) Gather user's input for backup directories (step 1 and/or step 2).
+2. Create an install script to do:  
+          a) Read LOGIN from LINUX environment.  
+          b) Gather user's input for installation directory.  
+          c) Gather user's input for backup directories (step 1 and/or step 2).  
+
