@@ -32,12 +32,12 @@ Debugging information will be saved to backup.log once the cron job got invoked.
 
 To-do items:
 ------------
-For step-2, need to evaluate whether mount/umount is needed to seperate the step-2 Disk from LINUX once backup is done. In this way, the Disk involved in step-2 should not be impacetd even if any corruptpion happened in LINUX enviornment. However, this may require root permission. Alternatively, create a seperate cron job for root login, this is optional for users and can mount/umount step-2 Disk as schedule if needed.
+For step-2, need to evaluate whether mount/umount is needed to seperate the Disk (used by step-2) from LINUX after backup is done. In this way, the Disk involved in step-2 should not be impacetd even if any corruptpion happened in LINUX enviornment. However, this may require root permission. Alternatively, create a seperate cron job for root login, this is optional for users and can mount/umount step-2 Disk as schedule if needed.
 
-More to-do items for others to use with no code modification needed:  
+More to-do items make it more user-friendly for others'use (for common backup purpose) :  
 ---------------------------------------------------------------------------------------  
-1. Make step-1 and step-2 configurable by end-users (which can be configured by #2)
-2. Create an installation script to do:  
-      - Read LOGIN from LINUX environment.  
+1. Ehance scripts to make step-1 and step-2 configurable by end-users.
+2. Create an installation script to do: 
+      - Read LOGIN from LINUX environment. 
       - Gather user's input for installation directory.  
       - Gather user's input for backup directories (step-1's, and also step-2's if wanted).  
