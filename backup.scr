@@ -57,7 +57,7 @@ do
 	then
 		crontab -l >${BKUP_DIR}/${DATE}/crons
 	else
-		echo "ERROR: ${dir_file} is not a directory or a file. Failed to backup!" >> ${BKUP_DIR}/${LOG}	
+		echo "ERROR: ${dir_file} is neither a directory or a file. Failed to backup it!" >> ${BKUP_DIR}/${LOG}	
 	fi
 done
 
