@@ -1,7 +1,7 @@
 # Specify directories or files with relative path to user's home or using absolute path 
-# To backup crontab, use key words CRONTAB
+# To backup crontab, please use key word CRONTAB
 # Blank and tab will be ignored in this file
-# Example:
+# Examples:
 #	bin
 #	/home/<other user's login>/html
 #       CRONTAB
