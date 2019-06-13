@@ -45,7 +45,7 @@ users can create a separate cron job for root login to mount/umount step-2 Disk 
 - Make it more user-friendly for others' use (for general backup purpose)   
 	- Enhance scripts to make step-1 and step-2 configurable by end-users.
 	- Create an installation script to help users to use:   
-		- Read LOGIN from LINUX environment.   
+		- Read LOGNAME from LINUX environment.   
 		- Gather user's input for installation directory.  
 		- Gather user's input for backup directories (step-1's, and/or step-2's).   
 
