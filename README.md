@@ -7,7 +7,12 @@ Currently they work well for my own Linux PC (with ubuntu 16 and Windows OS inst
 will do the following two steps:  
 - step-1: will backup to a directory residing on Linux. It will only contain the latest backup in 30 days  
 - step-2: will backup to a disk shared cross-mounted between Linux and windows. It will contain all history  
- backup, if the disk usage run above 80%, an error will be reported.   
+ backup, if the disk usage run above 80%, an error will be printed to log file.
+
+There are a few of alternatives to handle error notification in log file. For example, create another cronjob    
+to screen log file everyday and send emails if any errors. In my practice, I just created a simple tool to screen   
+log file and added it into my $HOME/.profile. In this way, I will see the errors in the screen if exist whenever       
+I log into my PC/system.    
 
 Source files:  
 -------------   
