@@ -1,7 +1,7 @@
 Tool Usage: 
 -----------------   
 - Put bkup.list to your $HOME, and add directories into it.   
-- Edit backup.scr for remote PC login, ip and directory     
+- Edit backup.scr for remote PC login, IP and directory     
 - Manual run backup.scr and cleanup.scr, verify backup successful   
 - Install backup.scr and cleanup.scr to be your cronjob   
 
