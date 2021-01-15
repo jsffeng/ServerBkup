@@ -2,20 +2,32 @@
 
 export PATH=/bin:/usr/bin:$PATH 
 
-# User config
+# Need be edited to your login id
 LOGIN=jason
-LINUX_VER=ubuntu
 
-# Variables defined by the tool
+# Need be edited to provide IP and remote login for your remote PC, 
+# also setup no password scp access for remote PC.
+# If no IP provided, will assume the dir has been mounted to 
+# local PC, and isMOUNT must be set an non-empty value.
+REMOTE_PC=172.17.214.202
+REMOTE_LOGIN=jason
+isMOUNT=
+
+# Need be edited to point to your dir for remote PC or local mounted dir
+REMOTE_PC_DIR=/home/jason/PC1_BACKUP
+
+# Optional for editing 
+LINUX_VER=ubuntu
+BIN_DIR=$HOME
+
+# Variables defined by the tool, do not change
 HOME=/home/${LOGIN}
-BIN_DIR=$HOME/bin/backup_bin 
 BKUP_DIR=$HOME/Backup
-PC_DIR=${LOGIN}.${LINUX_VER}.backup
 LOG=backup.log
 DEBUG_FILE=${BKUP_DIR}/.debug_backup
 
-# Mount path for Windows disk. e.g. adding /dev/sda6 into fstab 
-MOUNT_PATH=/E-DATA
+[ ! -z ${isMOUNT} ] || [ ! -z ${REMOTE_PC} ] || exit 1
+[ -d ${BKUP_DIR} ] || mkdir -p ${BKUP_DIR}
 
 exec 2>>${BKUP_DIR}/${LOG}
 
@@ -67,28 +79,31 @@ echo "${LINUX_VER}.${LOGIN}.${DATE}.tar.gz has been succesfully created at $(dat
 
 rm -rf ${DATE}
 
-# Transfered to E Disk in Windows OS 
+# Transfered to remote PC
 
-if [ -d ${MOUNT_PATH}/${PC_DIR} ]
+if [ ! -z ${REMOTE_PC} ]
 then
-	cp ${LINUX_VER}.${LOGIN}.${DATE}.tar.gz ${MOUNT_PATH}/${PC_DIR}/
-	echo "${LINUX_VER}.${LOGIN}.${DATE}.tar.gz has been succesfully transfered to ${MOUNT_PATH}/${PC_DIR}!" >>${LOG}
-	DISK_USE=$(df ${MOUNT_PATH} |tail -1  |awk  '{print $5}')
+	scp ${LINUX_VER}.${LOGIN}.${DATE}.tar.gz ${REMOTE_LOGIN}@${REMOTE_PC}:${REMOTE_PC_DIR}
+elif [ -d ${REMOTE_PC_DIR} ]
+then
+	cp ${LINUX_VER}.${LOGIN}.${DATE}.tar.gz ${REMOTE_PC_DIR}/
+	echo "${LINUX_VER}.${LOGIN}.${DATE}.tar.gz has been succesfully transfered to ${REMOTE_PC_DIR}!" >>${LOG}
+	DISK_USE=$(df ${REMOTE_PC_DIR} |tail -1  |awk  '{print $5}')
 	if [[ ${DISK_USE} =~ [0-9]% ]]
 	then
-		echo "INFO: ${MOUNT_PATH} disk usage is: ${DISK_USE}" >>${LOG}
+		echo "INFO: ${REMOTE_PC_DIR} disk usage is: ${DISK_USE}" >>${LOG}
 		if [ ${DISK_USE//%} -gt 80 ]
 		then
-			echo "ERROR: ${MOUNT_PATH} disk usage has beyond 80%. Urgent clean up needed! " >>${LOG}
+			echo "ERROR: ${REMOTE_PC_DIR} disk usage has beyond 80%. Urgent clean up needed! " >>${LOG}
 		elif [ ${DISK_USE//%} -gt 60 ]
 		then
-			echo "WARNING: ${MOUNT_PATH} disk usage has beyond 60%. Clean up needed! " >>${LOG}
+			echo "WARNING: ${REMOTE_PC_DIR} disk usage has beyond 60%. Clean up needed! " >>${LOG}
 		fi
 	else
-		echo "WARNING: Cannot determine the disk usage of ${MOUNT_PATH}!" >>${LOG}
+		echo "WARNING: Cannot determine the disk usage of ${REMOTE_PC_DIR}!" >>${LOG}
 	fi
 else
-	echo "ERROR: ${MOUNT_PATH}/${PC_DIR} missing! ${LINUX_VER}.${LOGIN}.${DATE}.tar.gz cannot been transferred to PC!" >>${LOG}
+	echo "ERROR: ${REMOTE_PC_DIR} missing! ${LINUX_VER}.${LOGIN}.${DATE}.tar.gz cannot been transferred to PC!" >>${LOG}
 fi
 
 if [ -f ${DEBUG_FILE} ]
