@@ -83,7 +83,7 @@ rm -rf ${DATE}
 
 if [ ! -z ${REMOTE_PC} ]
 then
-	scp ${LINUX_VER}.${LOGIN}.${DATE}.tar.gz ${REMOTE_LOGIN}@${REMOTE_PC}:${REMOTE_PC_DIR}
+	scp -o ConnectTimeout=30 ${LINUX_VER}.${LOGIN}.${DATE}.tar.gz ${REMOTE_LOGIN}@${REMOTE_PC}:${REMOTE_PC_DIR}
 elif [ -d ${REMOTE_PC_DIR} ]
 then
 	cp ${LINUX_VER}.${LOGIN}.${DATE}.tar.gz ${REMOTE_PC_DIR}/
